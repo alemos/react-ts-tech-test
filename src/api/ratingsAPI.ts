@@ -26,3 +26,12 @@ export function getEstablishmentRatings(
     { headers: { "x-api-version": "2" } }
   ).then((res) => res.json());
 }
+
+export function getEstablishmentDetails(
+  url: string
+): Promise<any> {
+  return fetch(
+    `${url}`,
+    { headers: { "x-api-version": "2" } }
+  ).then((res) => res.json());
+}

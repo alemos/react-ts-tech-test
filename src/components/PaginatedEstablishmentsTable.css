@@ -1,0 +1,7 @@
+.loading {
+    min-width: 550px;
+    min-height: 250px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
