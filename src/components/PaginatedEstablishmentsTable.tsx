@@ -37,9 +37,7 @@ export const PaginatedEstablishmentsTable = () => {
         setError(error);
       }
     );
-    console.log("establishments", establishments);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // remove 'establishments' and console.log
   }, []);
 
   async function handlePreviousPage() {

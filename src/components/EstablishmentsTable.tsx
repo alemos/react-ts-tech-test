@@ -12,7 +12,7 @@ const headerStyle: { [key: string]: string | number } = {
 };
 
 export const EstablishmentsTable: React.FC<{
-  establishments: { [key: string]: string }[] | null | undefined;
+  establishments: { [key: string]: any }[] | null | undefined;
 }> = ({ establishments }) => {
   const navigate = useNavigate();
   const onSelect = (establishment: any) => {
