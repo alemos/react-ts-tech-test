@@ -1,52 +1,72 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { EstablishmentDetails } from "./EstablishmentDetail";
+import userEvent from "@testing-library/user-event";
+
+const mockedUsedNavigate = jest.fn();
+const mockedMemoryRouter = jest.fn();
+
+jest.doMock("react-router-dom", () => ({
+  ...jest.requireMock("react-router-dom"),
+  useNavigate: () => mockedUsedNavigate,
+  MemoryRouter: () => mockedMemoryRouter,
+}));
+
+const mockLocationState = {
+  state: {
+    BusinessName: "Test Business",
+    AddressLine3: "123 Test Street",
+    BusinessType: "Retail",
+    LocalAuthorityName: "Test Authority",
+    PostCode: "AB12 3CD",
+  },
+};
 
 describe("EstablishmentDetails Component", () => {
-  it("renders establishment details correctly", () => {
-    const establishment = {
-      BusinessName: "Restaurant A",
-      AddressLine3: "123 Main St",
-      BusinessType: "Restaurant",
-      LocalAuthorityName: "City Hall",
-      PostCode: "12345",
-    };
-
+  test("renders the establishment details correctly", () => {
     render(
-      <MemoryRouter initialEntries={["/establishment"]}>
-        <EstablishmentDetails obj={{ state: establishment }} />
+      <MemoryRouter
+        initialEntries={[{ pathname: "/details", ...mockLocationState }]}
+      >
+        <Routes>
+          <Route path="/details" element={<EstablishmentDetails />} />
+        </Routes>
       </MemoryRouter>
     );
 
     expect(screen.getByText("Hello!")).toBeInTheDocument();
     expect(
-      screen.getByText(`BusinessName - ${establishment.BusinessName}`)
+      screen.getByText("BusinessName - Test Business")
     ).toBeInTheDocument();
     expect(
-      screen.getByText(`AddressLine3 - ${establishment.AddressLine3}`)
+      screen.getByText("AddressLine3 - 123 Test Street")
     ).toBeInTheDocument();
+    expect(screen.getByText("BusinessType - Retail")).toBeInTheDocument();
     expect(
-      screen.getByText(`BusinessType - ${establishment.BusinessType}`)
+      screen.getByText("LocalAuthorityName - Test Authority")
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        `LocalAuthorityName - ${establishment.LocalAuthorityName}`
-      )
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(`PostCode - ${establishment.PostCode}`)
-    ).toBeInTheDocument();
+    expect(screen.getByText("PostCode - AB12 3CD")).toBeInTheDocument();
+
+    const homeButton = screen.getByRole("button", { name: "Home" });
+    expect(homeButton).toBeInTheDocument();
   });
 
-  it("renders a link to the homepage", () => {
+  test("navigates back to the home page when the Home button is clicked", async () => {
     render(
-      <MemoryRouter initialEntries={["/establishment"]}>
-        <EstablishmentDetails obj={{ state: {} }} />
+      <MemoryRouter
+        initialEntries={[{ pathname: "/details", ...mockLocationState }]}
+      >
+        <Routes>
+          <Route path="/details" element={<EstablishmentDetails />} />
+          <Route path="/" element={<div>Home Page</div>} />
+        </Routes>
       </MemoryRouter>
     );
 
-    const link = screen.getByRole("link", { name: /Home/i });
-    expect(link).toHaveAttribute("href", "/");
+    const homeButton = screen.getByRole("button", { name: "Home" });
+    await userEvent.click(homeButton);
+
+    expect(screen.getByText("Home Page")).toBeInTheDocument();
   });
 });

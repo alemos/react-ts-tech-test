@@ -2,54 +2,57 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Dropdown from "./DropdownComponent";
 
-const options = ["Option 1", "Option 2", "Option 3"];
+describe("Dropdown Component", () => {
+  const mockOptions = ["Option 1", "Option 2", "Option 3"];
+  const mockOnSelect = jest.fn();
 
-describe.only("Dropdown Component", () => {
-  it("renders the dropdown button with placeholder", () => {
-    render(<Dropdown options={options} onSelect={() => {}} />);
-    const button = screen.getByText(/Select an option/i);
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("renders dropdown button with placeholder", () => {
+    render(<Dropdown options={mockOptions} onSelect={mockOnSelect} />);
+
+    const button = screen.getByRole("button", { name: /select an option/i });
     expect(button).toBeInTheDocument();
   });
 
-  it("opens and closes the dropdown menu", () => {
-    render(
-      <Dropdown
-        options={options}
-        onSelect={() => {}}
-        placeholder="Select an option"
-      />
-    );
-    const button = screen.getByText(/Select an option/i);
+  test("opens the dropdown menu when the button is clicked", () => {
+    render(<Dropdown options={mockOptions} onSelect={mockOnSelect} />);
+
+    const button = screen.getByRole("button", { name: /select an option/i });
 
     fireEvent.click(button);
-    expect(screen.getByText(/Option 1/i)).toBeInTheDocument();
 
-    fireEvent.click(button);
-    expect(screen.queryByRole("dropdown-button")).not.toBeInTheDocument();
+    expect(screen.getByText("Option 1")).toBeInTheDocument();
+    expect(screen.getByText("Option 2")).toBeInTheDocument();
+    expect(screen.getByText("Option 3")).toBeInTheDocument();
   });
 
-  it("selects an option and closes the dropdown", () => {
-    const onSelectMock = jest.fn();
-    render(<Dropdown options={options} onSelect={onSelectMock} />);
-    const button = screen.getByText(/Select an option/i);
+  test("closes the dropdown menu when an option is selected", () => {
+    render(<Dropdown options={mockOptions} onSelect={mockOnSelect} />);
+
+    const button = screen.getByRole("button", { name: /select an option/i });
 
     fireEvent.click(button);
-    const option = screen.getByText("Option 2");
-    fireEvent.click(option);
 
-    expect(onSelectMock).toHaveBeenCalledWith("Option 2");
-    expect(screen.queryByRole("dropdown")).not.toBeInTheDocument();
+    const firstOption = screen.getByText("Option 1");
+    fireEvent.click(firstOption);
+
+    expect(screen.queryByText("Option 2")).not.toBeInTheDocument();
+    expect(mockOnSelect).toHaveBeenCalledWith("Option 1");
   });
 
-  it("renders with a custom placeholder", () => {
+  test("handles custom placeholder correctly", () => {
     render(
       <Dropdown
-        options={options}
-        onSelect={() => {}}
-        placeholder="Select an option"
+        options={mockOptions}
+        onSelect={mockOnSelect}
+        placeholder="Custom Placeholder"
       />
     );
-    const button = screen.getByText(/Select an option/i);
+
+    const button = screen.getByRole("button", { name: /custom placeholder/i });
     expect(button).toBeInTheDocument();
   });
 });
